@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>NUMBERS</title>
+        <meta name='keyword' content="数字,ゲーム,遊ぶ,number,game,play">
+        <meta name='description' content="ランダムに生成される数字を推理して当てるゲームです。">
+        <link rel="stylesheet" href="third.css">
+        <link rel="stylesheet" href="reset.css">
+    </head>
+</html>
+<body>
+    <div id='top'>
+        <h1>「３桁ゲーム」</h1>
+        <div class="btn" id='start_reset'>
+            <a href="#" id="start">スタート</a>
+        </div>
+    </div>
+    <div id='explain' class="container">
+        <img src="hint.png" id='black'>
+        <div class="balloon2-left">
+            <p id='hint'>スタートを押すと数字が生成されるよ。</p>
+        </div>
+    </div>
+    <div class="container">
+        <form action="#" id="form">
+            <input type="text" name="num" placeholder="半角で３桁の数字を入力してね">
+            <div>
+                <input type="submit" value='回答' class="btn">
+            </div>
+        </form>
+    </div>
+    <div id ='result' class="container">
+        <p>結果(入力した数字とHIT,INCLUDEの値)</p>
+        <ul id="results">
+        </ul>
+    </div>
+    <div  id='return' class="btn">
+        <a href="top.html">戻る→</a>
+    </div>
+
+    <script src="../num.js"></script>
+    <script>
+        'use strict';
+        //toString(nullなども判定可)可を使うため
+        const toString = Object.prototype.toString;
+        
+        let rivalNumArray = [];
+        //相手の数字生成
+        document.getElementById('start').onclick = function() {  
+            const results = document.getElementById('results')
+            while( results.firstChild ){
+                results.removeChild( results.firstChild );
+            }
+
+            document.getElementById('start').textContent='リセット';
+            document.getElementById('hint').innerHTML = '数字を生成したよ。数字を予想して入力してね。<br>数字と位置があっている数を「hit」、数字だけあってる数を「include」で返すよ。';
+
+            let rondomNumArray = [];     
+            for (let i = 0; rondomNumArray.length < 3; i++){
+                const randomNum = String(Math.floor(Math.random() * 10));
+                if(!rondomNumArray.includes(randomNum)){
+                    rondomNumArray.push(randomNum);
+                }
+            }
+            rivalNumArray = rondomNumArray;
+        };
+
+        //送信された値のhit,includeを返し、htmlを変更
+        document.getElementById('form').onsubmit = function(event) {
+            event.preventDefault();
+            let myNum = document.getElementById('form').num.value.replace(/[^\d.]/g, '');
+            const myNumArray = myNum.split('');
+
+            if (myNumArray.length === 3 && rivalNumArray.length === 3) {
+                console.log(rivalNumArray);
+                console.log(myNumArray);
+                
+                let hitNum = hit(myNumArray);
+                let incNum = include(myNumArray) - hitNum;
+                console.log(hitNum);
+                console.log(incNum);
+
+                const result = `<li class='result'>「${myNum}」:　「hit」${hitNum},「include」${incNum}<li>`;
+                document.getElementById('results').insertAdjacentHTML('beforeend', result);
+                if (hitNum === 3) {
+                    document.getElementById('hint').innerHTML = `おめでとう！答えは「${rivalNumArray.join('')}」だったよ！<br>5桁のゲームにも挑戦してみてね！`
+                    window.alert('正解だよ！５桁にも挑戦してみてね！！');
+                }else{
+                    document.getElementById('hint').textContent = `数字だけあっている数は${incNum}個、数字と位置両方あっている数は${hitNum}個だよ。`
+                };
+            }else if(!rivalNumArray.length === 3){
+                window.alert('スタートボタンを押してね！') 
+            }else{
+                window.alert('半角で３桁の数字を入力してね。')
+            };
+        };
+
+    </script>
+</body>
